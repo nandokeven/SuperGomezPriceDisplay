@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Prices</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>FRUTAS Y VERDURAS</h2>
+        <div class="tables-container">
+            <table class="table table-bordered table-striped" id="price-table-left">
+                <thead class="table-dark">
+                    <tr>
+                        <th>PRODUCTOS</th>
+                        <th>PRECIO POR KILO</th>
+                    </tr>
+                </thead>
+                <tbody id="price-body-left">
+                    <!-- Left column products -->
+                </tbody>
+            </table>
+            <table class="table table-bordered table-striped" id="price-table-right">
+                <thead class="table-dark">
+                    <tr>
+                        <th>PRODUCTOS</th>
+                        <th>PRECIO POR KILO</th>
+                    </tr>
+                </thead>
+                <tbody id="price-body-right">
+                    <!-- Right column products -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const priceBodyLeft = document.getElementById('price-body-left');
+        const priceBodyRight = document.getElementById('price-body-right');
+
+        async function fetchPrices() {
+            try {
+                const response = await fetch('/prices');
+                const data = await response.json();
+                console.log('[FETCH] Received data:', data);
+                return data;
+            } catch (error) {
+                console.error('[ERROR] Fetch failed:', error);
+                return [];
+            }
+        }
+
+        async function updateTables() {
+            const products = await fetchPrices();
+            if (!products.length) return;
+
+            // Split products into two columns
+            const midPoint = Math.ceil(products.length / 2);
+            const leftProducts = products.slice(0, midPoint);
+            const rightProducts = products.slice(midPoint);
+
+            // Update left table
+            priceBodyLeft.innerHTML = '';
+            leftProducts.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.id = `left-${row['Producto']}`;
+                tr.innerHTML = `
+                    <td>${row['Producto']}</td>
+                    <td class="price">${row['P. Venta']}</td>
+                `;
+                priceBodyLeft.appendChild(tr);
+            });
+
+            // Update right table
+            priceBodyRight.innerHTML = '';
+            rightProducts.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.id = `right-${row['Producto']}`;
+                tr.innerHTML = `
+                    <td>${row['Producto']}</td>
+                    <td class="price">${row['P. Venta']}</td>
+                `;
+                priceBodyRight.appendChild(tr);
+            });
+
+            // Price update interval
+            setInterval(async () => {
+                const newProducts = await fetchPrices();
+                newProducts.forEach(newProduct => {
+                    const leftRow = document.getElementById(`left-${newProduct['Producto']}`);
+                    const rightRow = document.getElementById(`right-${newProduct['Producto']}`);
+                    const row = leftRow || rightRow;
+                    if (row) {
+                        const priceCell = row.querySelector('.price');
+                        const currentPrice = priceCell.textContent;
+                        if (currentPrice !== `${newProduct['P. Venta']}`) {
+                            priceCell.textContent = newProduct['P. Venta'];
+                            priceCell.classList.remove('price-changed');
+                            void priceCell.offsetWidth;
+                            priceCell.classList.add('price-changed');
+                            console.log(`[PRICE CHANGE] ${newProduct['Producto']} updated to ${newProduct['P. Venta']}`);
+                        }
+                    }
+                });
+            }, 10000);
+        }
+
+        updateTables();
+    </script>
+</body>
+</html>

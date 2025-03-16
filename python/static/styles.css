@@ -1,0 +1,86 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+.container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+h2 {
+    color: orange;
+    font-weight: bold;
+    font-size: 2rem; /* Reduced from 3rem */
+    margin: 5px 0;
+    text-align: center;
+}
+
+.tables-container {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+    width: 100%;
+    gap: 10px;
+}
+
+.table {
+    background-color: black;
+    color: white;
+    width: 45%;
+    font-size: 1rem; /* Reduced from 1.8rem */
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    border: 1px solid white;
+    padding: 0.3vh; /* Reduced padding */
+    vertical-align: middle;
+    text-align: center;
+}
+
+.table th {
+    background-color: black;
+    font-size: 1.2rem; /* Reduced from 2.2rem */
+}
+
+.table thead th {
+    height: 3vh; /* Reduced header height */
+}
+
+.table tbody td:nth-child(1) {
+    color: red;
+    font-weight: bold;
+}
+
+.table tbody td:nth-child(2) {
+    color: white;
+    font-weight: bold;
+}
+
+/* Dynamic row height calculation for 19 rows per table */
+.table tbody tr {
+    height: calc((100vh - 2rem - 3vh - 10px) / 19);
+}
+
+.price-changed {
+    animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); color: white; }
+    50% { transform: scale(1.1); color: yellow; }
+    100% { transform: scale(1); color: white; }
+}
+
+.table tbody tr:hover {
+    background-color: #333;
+}
